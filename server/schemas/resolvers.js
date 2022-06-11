@@ -1,5 +1,5 @@
-const { User } = require('../models');
 const { AuthenticationError } = require('apollo-server-express');
+const { User } = require('../models');
 const { sToken } = require('../utils/auth');
 
 const resolvers = {
@@ -45,7 +45,7 @@ Mutation: {
     const token = sToken(user);
     return { token, user };
     },
-    saveBook: async (parent, { user, body }, context) => {
+    saveBook: async (parent, { book }, context) => {
         if (!context.user) {
             const updateUser = await User.findOneAndUpdate(
                 { _id: user._id },
@@ -55,7 +55,7 @@ Mutation: {
 
             await User.findByIdAndUpdate(
                 {_id: context.user._id},
-                {$push: {thoughts: thought._id } },
+                {$addToSet: {savedBooks: book } },
                 { new: true } 
             );
 
