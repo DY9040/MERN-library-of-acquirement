@@ -13,18 +13,6 @@ const resolvers = {
                 return userData;
             }
             throw new AuthenticationError('You must be logged in to access this data');
-        },
-        //gets all users
-        users: async () => {
-            return User.find()
-            .select('-__v -password')
-            .populate('savedBooks');
-        },
-        //gets a single user by Username
-        user: async (parent, { username }) => {
-            return User.findOne({ username })
-            .select('-__v -password')
-            .populate('savedBooks');
         }
 },
 Mutation: {
@@ -46,14 +34,8 @@ Mutation: {
     return { token, user };
     },
     saveBook: async (parent, { book }, context) => {
-        if (!context.user) {
+        if (context.user) {
             const updateUser = await User.findOneAndUpdate(
-                { _id: user._id },
-                { $addToSet: { savedBooks: body } },
-                { new: true, runValidators: true }
-            );
-
-            await User.findByIdAndUpdate(
                 {_id: context.user._id},
                 {$addToSet: {savedBooks: book } },
                 { new: true } 
